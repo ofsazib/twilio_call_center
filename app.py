@@ -26,5 +26,19 @@ def inbound_call():
                                url=BASE_URL + '/conference/' + call_sid)
     return Response(str(response), 200, mimetype="application/xml")
 
+@app.route('/conference/<conference_name>', methods=['GET', 'POST'])
+def conference_line(conference_name):
+    response = twiml.Response()
+    response.dial(hangupOnStar=True).conference(conference_name)
+    return Response(str(response), 200, mimetype="application/xml")
+
+@app.route('/add-agent/<conference_name>', methods=['POST'])
+def add_second_agent(conference_name):
+    client.calls.create(to=AGENT2_NUMBER, from_=CUSTOMER_SERVICE_NUMBER,
+                        url=BASE_URL + '/conference/' + conference_name)
+    response = twiml.Response()
+    response.dial(hangupOnStar=True).conference(conference_name)
+    return Response(str(response), 200, mimetype="application/xml")
+
 if __name__ == '__main__':
 	app.run(debug=True)
