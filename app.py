@@ -16,5 +16,15 @@ AGENT2_NUMBER = os.environ.get('AGENT2_NUMBER','')
 # Ngrok url
 BASE_URL = os.environ.get('BASE_URL', 'http://75ad30f0.ngrok.io')
 
+@app.route('/call', methods=['POST'])
+def inbound_call():
+    call_sid = request.form['CallSid']
+    response = twiml.Response()
+    response.dial().conference(call_sid)
+    call = client.calls.create(to=AGENT1_NUMBER,
+                               from_=CUSTOMER_SERVICE_NUMBER,
+                               url=BASE_URL + '/conference/' + call_sid)
+    return Response(str(response), 200, mimetype="application/xml")
+
 if __name__ == '__main__':
 	app.run(debug=True)
